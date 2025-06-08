@@ -1,0 +1,23 @@
+{
+  "name": "streamerbot",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.ts",
+  "scripts": {
+    "dev": "tsx --env-file=.env index.ts",
+    "build": "tsc"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "devDependencies": {
+    "@types/node": "^22.15.30",
+    "@types/tmi.js": "^1.8.6",
+    "tsx": "^4.19.4",
+    "typescript": "^5.8.3"
+  },
+  "dependencies": {
+    "obs-websocket-js": "^5.0.6",
+    "tmi.js": "^1.8.5"
+  }
+}
