@@ -49,16 +49,46 @@ async function setSourceVisibility(obs: OBSWebSocket, sourceName: string, visibl
     }
 }
 
+async function switchScene(obs: OBSWebSocket, sceneName: string) {
+    try {
+        await obs.call('SetCurrentProgramScene', { sceneName });
+        console.log(`Switched to scene: "${sceneName}"`);
+    } catch (error) {
+        console.warn(`Failed to switch to scene "${sceneName}":`, error);
+    }
+}
 
 async function handleCommand(command: string, {obs}: {obs: OBSWebSocket}) {
-    const { source, bool } = command.match(/^(?<source>.+?) (?<bool>on|off)$/)?.groups || {};
-
-    if (!source || !bool) {
-        console.warn("Invalid command", command, source, bool);
+    // Check for ts command (toggle source): !ts source on/off
+    const tsMatch = command.match(/^ts (?<source>.+?) (?<bool>on|off)$/);
+    if (tsMatch) {
+        const { source, bool } = tsMatch.groups!;
+        await setSourceVisibility(obs, source, bool === "on");
         return;
     }
 
-    await setSourceVisibility(obs, source, bool === "on");
+    // Check for ss command (switch scene): !ss sceneName
+    const ssMatch = command.match(/^ss (?<sceneName>.+)$/);
+    if (ssMatch) {
+        const { sceneName } = ssMatch.groups!;
+        await switchScene(obs, sceneName);
+        return;
+    }
+
+    // Legacy support for old format: !source on/off
+    const legacyMatch = command.match(/^(?<source>.+?) (?<bool>on|off)$/);
+    if (legacyMatch) {
+        const { source, bool } = legacyMatch.groups!;
+        await setSourceVisibility(obs, source, bool === "on");
+        return;
+    }
+
+    // If no valid command format found
+    console.warn("Invalid command format:", command);
+    console.warn("Supported formats:");
+    console.warn("  !ts source on/off  - Toggle source visibility");
+    console.warn("  !ss sceneName      - Switch to scene");
+    console.warn("  !source on/off     - Legacy toggle source (deprecated)");
 }
 
 async function registerObsEvents({obs}: {obs: OBSWebSocket}) {
