@@ -21,7 +21,7 @@ Example:
 !ts Desktop Camera on
 ```
 
-### !ss sceneName
+### !ss Scene Name
 
 Switch to a scene.
 
@@ -29,4 +29,26 @@ Example:
 
 ```
 !ss Scene 2
+```
+
+### !startvc / !stopvc
+
+Start or stop the virtual camera.
+
+Example:
+
+```
+!startvc
+!stopvc
+```
+
+### !start / !stop
+
+Start or stop the stream.
+
+Example:
+
+```
+!start
+!stop
 ```

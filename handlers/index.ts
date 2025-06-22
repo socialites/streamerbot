@@ -58,7 +58,67 @@ async function switchScene(obs: OBSWebSocket, sceneName: string) {
     }
 }
 
+async function startStreaming(obs: OBSWebSocket) {
+    try {
+        await obs.call('StartStream');
+        console.log('Started streaming');
+    } catch (error) {
+        console.warn('Failed to start streaming:', error);
+    }
+}
+
+async function stopStreaming(obs: OBSWebSocket) {
+    try {
+        await obs.call('StopStream');
+        console.log('Stopped streaming');
+    } catch (error) {
+        console.warn('Failed to stop streaming:', error);
+    }
+}
+
+async function startVirtualCamera(obs: OBSWebSocket) {
+    try {
+        const result = await obs.call('StartVirtualCam');
+        console.log('Started virtual camera', result);
+    } catch (error) {
+        console.warn('Failed to start virtual camera:', error);
+    }
+}
+
+async function stopVirtualCamera(obs: OBSWebSocket) {
+    try {
+        await obs.call('StopVirtualCam');
+        console.log('Stopped virtual camera');
+    } catch (error) {
+        console.warn('Failed to stop virtual camera:', error);
+    }
+}
+
 async function handleCommand(command: string, {obs}: {obs: OBSWebSocket}) {
+    // Check for start streaming command: !start
+    if (command === 'start') {
+        await startStreaming(obs);
+        return;
+    }
+
+    // Check for stop streaming command: !stop
+    if (command === 'stop') {
+        await stopStreaming(obs);
+        return;
+    }
+
+    // Check for start virtual camera command: !startvc
+    if (command === 'startvc') {
+        await startVirtualCamera(obs);
+        return;
+    }
+
+    // Check for stop virtual camera command: !stopvc
+    if (command === 'stopvc') {
+        await stopVirtualCamera(obs);
+        return;
+    }
+
     // Check for ts command (toggle source): !ts source on/off
     const tsMatch = command.match(/^ts (?<source>.+?) (?<bool>on|off)$/);
     if (tsMatch) {
@@ -86,9 +146,13 @@ async function handleCommand(command: string, {obs}: {obs: OBSWebSocket}) {
     // If no valid command format found
     console.warn("Invalid command format:", command);
     console.warn("Supported formats:");
-    console.warn("  !ts source on/off  - Toggle source visibility");
-    console.warn("  !ss sceneName      - Switch to scene");
-    console.warn("  !source on/off     - Legacy toggle source (deprecated)");
+    console.warn("  !start              - Start streaming");
+    console.warn("  !stop               - Stop streaming");
+    console.warn("  !startvc            - Start virtual camera");
+    console.warn("  !stopvc             - Stop virtual camera");
+    console.warn("  !ts source on/off   - Toggle source visibility");
+    console.warn("  !ss sceneName       - Switch to scene");
+    console.warn("  !source on/off      - Legacy toggle source (deprecated)");
 }
 
 async function registerObsEvents({obs}: {obs: OBSWebSocket}) {
